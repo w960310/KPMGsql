@@ -259,6 +259,94 @@ unload to policy_no_all.txt
 select * from s1
 
 
+--
+
+drop table if exists a1;
+drop table if exists cc;
+
+create temp table cc
+(value_date char(10));
+
+insert into cc
+values('111/06/30');
+
+select insurance_type, modx, sum(upr)
+from upr43 inner join cc on upr43.value_date = cc.value_date
+group by 1,2
+order by 1,2;
+
+select c.currency,a.insurance_type, c.modx, sum(upr)
+from arco_a a, cc b, arkt c
+where a.value_date = b.value_date
+and a.policy_no = c.policy_no
+and a.coverage_no = c.coverage_no
+and a.policy_no||a.coverage_no not in (
+select policy_no||coverage_no from upr43 a, cc b
+where a.value_date = b.value_date)
+and a.plan_abbr_code <> 'GPA'
+group by 1,2,3
+order by 1,2,3;
+
+select 'P' insurance_type, modx, sum(upr)
+from upr_com inner join cc on upr_com.value_date = cc.value_date
+group by 1,2
+order by 1,2;
+
+select currency, insurance_type, '1' modx, sum(upr)
+from vupr_all inner join cc on vupr_all.value_date = cc.value_date
+group by 1,2,3
+order by 1,2,3;
+
+select c.insurance_type, a.modx, sum(upr)
+from gico_upr a, cc b, gipf c
+where a.value_date = b.value_date
+and a.plan_code = c.plan_code
+and a.rate_scale = c.rate_scale
+group by 1,2
+order by 1,2;
+
+select insurance_type, modx, sum(upr)
+from ginw_upr_v1 inner join cc on ginw_upr_v1.value_date = cc.value_date
+group by 1,2
+order by 1,2;
+--
+create temp table cc
+(value_date char(10));
+
+insert into cc
+values('111/05/31');
+
+drop table if exists a1;
+
+select plan_abbr_code, policy_no, upr 
+from KAD INNER JOIN cc ON KAD.value_date = cc.value_date
+where plan_abbr_code = 'KAD'
+into temp a1;
+
+insert into a1
+select plan_abbr_code, policy_no, upr 
+from JPA INNER JOIN cc ON JPA.value_date = cc.value_date
+where plan_abbr_code = 'JPA';
+
+insert into a1
+select plan_abbr_code, policy_no, upr 
+from JYL INNER JOIN cc ON JYL.value_date = cc.value_date
+where plan_abbr_code = 'PWL';
+
+insert into a1
+select plan_abbr_code, policy_no, upr 
+from SFDR INNER JOIN cc ON SFDR.value_date = cc.value_date
+where plan_abbr_code = 'SFDR';
+
+insert into a1
+select plan_abbr_code, policy_no, upr 
+from SPA INNER JOIN cc ON SPA.value_date = cc.value_date
+where plan_abbr_code = 'SPA';
+
+unload to 'upr_1110531.txt'
+select * from a1
+
+
 
 
 

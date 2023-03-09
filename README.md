@@ -127,5 +127,146 @@ into temp a1;
 
 unload to '美元健康險.txt'
 select * from a1
+---------------------------
+drop table if exists cc;
+drop table if exists a1;
+drop table if exists b1;
+
+create temp table cc
+(value_date char(10));
+
+insert into cc
+values('111/09/30');
+
+select AED_KED.value_date, policy_no, po_issue_date, plan_abbr_code, 
+'TWD' as currency, modx, paid_to_date, days, agp, upr, face_amt,unit_value
+from AED_KED INNER JOIN cc on AED_KED.value_date = cc.value_date
+where policy_no in ('174100139409','178300113187',
+'143600202062','143800122234','177500206100')
+into temp b1;
+
+
+select AHAD.value_date, policy_no, co_issue_date, dur, plan_abbr_code, 
+face_amt, 'TWD' as currency, modx, paid_to_date, unit_value, day1, day2, 
+t0, t1, agp_p_modx, upr
+from AHAD INNER JOIN cc on AHAD.value_date = cc.value_date
+where policy_no in ('147700801530','172200968520',
+'165100016760','142301073951','148000214656')
+into temp a1;
+
+insert into a1
+select KAD.value_date, policy_no, co_issue_date, dur, plan_abbr_code, 
+face_amt, 'TWD' as currency, modx, paid_to_date, unit_value, day1, day2, 
+t0, t1, agp_p_modx, upr
+from KAD INNER JOIN cc on KAD.value_date = cc.value_date
+where policy_no in ('165700023270','175100478335',
+'147700847954','147700846377','160600319847');
+
+insert into a1
+select JPA.value_date, policy_no, co_issue_date, dur, plan_abbr_code, 
+face_amt, 'TWD' as currency, modx, paid_to_date, unit_value, day1, day2, 
+t0, t1, agp_p_modx, upr
+from JPA INNER JOIN cc on JPA.value_date = cc.value_date
+where policy_no in ('146800320619','175300508676',
+'175300509777','162800168946','179200260931');
+
+insert into a1
+select PWPR_v1.value_date, policy_no, co_issue_date, dur, plan_abbr_code, 
+face_amt, 'TWD' as currency, modx, paid_to_date, unit_value, day1, day2, 
+t0, t1, agp_p_modx, upr
+from PWPR_v1 INNER JOIN cc on PWPR_v1.value_date = cc.value_date
+where policy_no in ('173200247147','156900050205',
+'177500328134','142300801419','176700355552');
+
+unload to 'upr_aed_1110930.txt'
+select a.*, b.po_sts_code from b1 a, polf b
+where a.policy_no = b.policy_no;
+
+unload to 'upr_1110930.txt'
+select a.*, b.po_sts_code from a1 a, polf b
+where a.policy_no = b.policy_no
+order by plan_abbr_code
+
+
+--
+
+unload to JAD_policy_no.txt
+select  plan_abbr_code, policy_no, upr, value_date
+from KAD
+where plan_abbr_code = 'JAD'
+and  value_date = '111/12/31'
+
+unload to JPA_policy_no.txt
+select  plan_abbr_code, policy_no, upr, value_date
+from JPA
+where plan_abbr_code = 'JPA'
+and  value_date = '111/12/31'
+
+unload to JYL_policy_no.txt
+select  plan_abbr_code, policy_no, upr, value_date
+from JYL
+where plan_abbr_code = 'JYL'
+and  value_date = '111/12/31'
+
+unload to KAD_policy_no.txt
+select  plan_abbr_code, policy_no, upr, value_date
+from KAD
+where plan_abbr_code = 'KAD'
+and  value_date = '111/12/31'
+
+unload to SFR_policy_no.txt
+select  plan_abbr_code, policy_no, upr, value_date
+from SFR
+where plan_abbr_code = 'SFR'
+and  value_date = '111/12/31'
+
+-語法錯誤
+
+drop temp table s1
+
+select  plan_abbr_code, policy_no, upr, value_date
+from KAD
+where plan_abbr_code = 'JAD'
+and  value_date = '111/12/31'
+into temp s1
+;
+insert into temp s1
+select  plan_abbr_code, policy_no, upr, value_date
+from JPA
+where plan_abbr_code = 'JPA'
+and  value_date = '111/12/31'
+;
+insert into temp s1
+select  plan_abbr_code, policy_no, upr, value_date
+from JYL
+where plan_abbr_code = 'JYL'
+and  value_date = '111/12/31'
+;
+insert into temp s1
+select  plan_abbr_code, policy_no, upr, value_date
+from KAD
+where plan_abbr_code = 'KAD'
+and  value_date = '111/12/31'
+;
+insert into temp s1
+select  plan_abbr_code, policy_no, upr, value_date
+from SFR
+where plan_abbr_code = 'SFR'
+and  value_date = '111/12/31'
+;
+
+unload to policy_no_all.txt
+select * from s1
+
+
+
+
+
+
+
+
+
+
+
 
 
